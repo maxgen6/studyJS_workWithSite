@@ -1,36 +1,51 @@
 'use strict';
 
-const collectionBooks = document.querySelectorAll('.books'),
-        elemsBooks = document.querySelectorAll('.book'),
-        deleteAdvertisment = document.querySelectorAll('.adv'),
-        head = document.getElementsByTagName('a')[4],
-        elemsBook = document.getElementsByTagName('li');
-       
+const output = document.getElementById('output');
+
+const getData = (url) => {
+        return new Promise((resolve, reject) => {
         
+        const request = new XMLHttpRequest();
+        request.open('GET', url);
+        request.addEventListener('readystatechange', () => {
+                if(request.readyState !== 4){
+                        return;
+                } 
+                if(request.status === 200){
+                        const response = JSON.parse(request.responseText);
+                        resolve(response);
+                } else {
+                        reject(request.statusText);
+                }
+        });
+        request.send();
+        });       
+};
+const outputPhotos = (data) => {
+  
+   data.forEach((item) => {
+        output.insertAdjacentHTML('beforebegin',
+  `<h4>${item.title}</h4>
+  <img src="${item.thunbnailUrl}" alt="${item.title}">`);
+   });    
 
-console.log(elemsBooks);
+   
+};
 
-collectionBooks[0].append(elemsBooks[2]);
-collectionBooks[0].prepend(elemsBooks[1]);
-elemsBooks[4].after(elemsBooks[3]);
+const urlPhotos = 'https://jsonplaceholder.typicode.com/photos';
 
-head.textContent = 'Книга 3. this и Прототипы Объектов';
+const oneImg = getData('https://jsonplaceholder.typicode.com/photos/1'),
+        twoImg = getData('https://jsonplaceholder.typicode.com/photos/2');
 
-document.body.style.backgroundImage = 'url(./image/you-dont-know-js.jpg)';
+// oneImg 
+//         .then(outputPhotos)
+//         .catch(error => console.log(error));
 
-elemsBook[16].before(elemsBook[8]);
-elemsBook[9].before(elemsBook[11]);
-elemsBook[10].before(elemsBook[13]);
+// twoImg
+//         .then(outputPhotos)
+//         .catch(error => console.log(error));
 
-elemsBook[38].before(elemsBook[45]);
-elemsBook[41].after(elemsBook[39]);
-elemsBook[44].after(elemsBook[42]);
+Promise.all([oneImg, twoImg])
+        .then(outputPhotos)
+        .catch(error => console.log(error));
 
-const newElem = document.createElement('li');
-newElem.textContent = 'Глава 8: За пределами ES6';
-console.log(newElem);
-elemsBook[55].after(newElem);
-
-console.log(elemsBook);
-
-deleteAdvertisment[0].remove();
